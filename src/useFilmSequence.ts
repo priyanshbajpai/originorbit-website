@@ -1,195 +1,128 @@
 import { useEffect, type RefObject } from 'react';
+import { FILM_DESKTOP, FILM_MOBILE } from './site-data';
 
-export const FILM_DURATION = 20;
-export const FRAME_COUNT = 240;
+export const FILM_DURATION = 19.333333;
 export const FILM_CHAPTERS = [
   { time: 3.2, text: 'Every idea has an origin' },
   { time: 5.0, text: 'Take it somewhere unexpected' },
-  { time: 10.9, text: 'Give it shape by hand' },
-  { time: 16.3, text: 'Make something worth remembering' },
+  { time: 10.3, text: 'Give it shape by hand' },
+  { time: 16.7, text: 'Make something worth remembering' },
 ];
-const sceneFrames = [0, ...FILM_CHAPTERS.map(item => Math.round(item.time / FILM_DURATION * (FRAME_COUNT - 1))), FRAME_COUNT - 1];
-const previewSeconds = [0,1,2,3,3.2,4,5,6,7,8,9,10,10.9,11,12,13,14,15,16,16.3,17,18,19,19.9];
+export type FilmStatus = 'loading' | 'ready' | 'error';
 
 type Options = {
   root: RefObject<HTMLElement | null>;
-  canvas: RefObject<HTMLCanvasElement | null>;
+  video: RefObject<HTMLVideoElement | null>;
   progressBar: RefObject<HTMLSpanElement | null>;
   reduced: boolean;
-  mobile: boolean;
   onChapter: (chapter: number) => void;
+  onStatus: (status: FilmStatus) => void;
 };
-export function useFilmSequence({ root, canvas, progressBar, reduced, mobile, onChapter }: Options) {
+
+// Decode one native 24 fps video. Serialize seeks: changing currentTime during
+// an unfinished seek can prevent Safari from presenting that frame at all.
+export function useFilmSequence({ root, video, progressBar, reduced, onChapter, onStatus }: Options) {
   useEffect(() => {
-    const section = root.current, surface = canvas.current;
-    // Check the actual media queries here as well: hydration initially uses the
-    // server defaults, which must not start desktop downloads on a phone.
-    if (!section || !surface || reduced || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const phone = matchMedia('(max-width: 700px), (max-width: 1000px) and (orientation: portrait)').matches;
-    const context = surface.getContext('2d', { alpha: false });
-    if (!context) return;
-    const cache = new Map<number, ImageBitmap>();
-    const pending = new Map<number, AbortController>();
-    const failed = new Set<number>();
-    const preview = new Image();
-    let previewReady = false;
-    const tileWidth = phone ? 480 : 720, tileHeight = phone ? 510 : 405;
-    const limit = phone ? 17 : 21;
-    let target = 0, drawn = -1, drawnQuality = '', direction = 1, chapter = -2;
-    let raf = 0, disposed = false, visible = true, dirty = true;
-    let width = 0, height = 0, start = 0, distance = 1;
-    const path = (index: number) => `/media/final-v3/${phone ? 'mobile' : 'desktop'}/${String(index).padStart(3, '0')}.webp`;
+    const section = root.current, film = video.current;
+    if (!section || !film || reduced || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const media = matchMedia('(max-width: 700px), (max-width: 1000px) and (orientation: portrait)');
+    let start = 0, distance = 1, desired = 0, chapter = -2;
+    let raf = 0, disposed = false, visible = true, loaded = false;
+    let lastStep = performance.now(), frameCallback = 0;
+    const supportsFrameCallback = typeof film.requestVideoFrameCallback === 'function';
+    const endTime = () => Math.max(0, (Number.isFinite(film.duration) ? film.duration : FILM_DURATION) - 1 / 24);
+
+    const publish = (time: number) => {
+      if (disposed || !loaded) return;
+      let next = -1;
+      FILM_CHAPTERS.forEach((item, index) => { if (time >= item.time) next = index; });
+      if (next !== chapter) { chapter = next; onChapter(next); }
+      film.dataset.time = time.toFixed(3);
+      film.classList.add('is-ready');
+      onStatus('ready');
+    };
+    const presented = (_: number, metadata: VideoFrameCallbackMetadata) => {
+      publish(metadata.mediaTime);
+      if (!disposed) frameCallback = film.requestVideoFrameCallback(presented);
+    };
     const measure = () => {
-      const bounds = surface.getBoundingClientRect();
-      const ratio = Math.min(devicePixelRatio || 1, phone ? 2 : 1.5, (phone ? 960 : 1800) / Math.max(1, bounds.width));
-      width = Math.round(bounds.width * ratio);
-      height = Math.round(bounds.height * ratio);
-      if (surface.width !== Math.max(1, width)) surface.width = Math.max(1, width);
-      if (surface.height !== Math.max(1, height)) surface.height = Math.max(1, height);
+      const stage = section.querySelector<HTMLElement>('.hero-stage');
       start = section.getBoundingClientRect().top + window.scrollY;
-      distance = Math.max(1, section.offsetHeight - bounds.height);
-      dirty = true;
+      distance = Math.max(1, section.offsetHeight - (stage?.offsetHeight || innerHeight));
       schedule();
     };
-    const paint = (index: number, image: CanvasImageSource, sourceWidth: number, sourceHeight: number, sourceX: number, sourceY: number, quality: 'full' | 'preview') => {
-      if (!dirty && index === drawn && quality === drawnQuality) return;
-      const time = index / (FRAME_COUNT - 1) * FILM_DURATION;
-      context.fillStyle = '#030405'; context.fillRect(0, 0, width, height);
-      if (phone) {
-        // Phone frames were cropped from the 4K master before compression;
-        // another horizontal crop here would enlarge a low-resolution sliver.
-        const imageHeight = sourceHeight * width / sourceWidth;
-        // A seamless black sky carries the copy. The miniature remains generous
-        // below it, without placing a detached widescreen player on the page.
-        const opening = Math.max(0, 1 - time / 3.4);
-        const available = height * (.75 - opening * .21);
-        const dh = Math.min(imageHeight, available);
-        const sh = dh * sourceWidth / width;
-        const centeredTop = Math.max(height * .27, height * .54 - dh / 2);
-        // The close sculpting shots settle toward the bottom of the viewport,
-        // so the flower does not read as a detached film rectangle on a phone.
-        const settling = Math.max(0, Math.min(1, (time - 10) / 4));
-        const restingTop = centeredTop * (1 - settling) + Math.max(0, height - dh) * settling;
-        const dy = restingTop * (1 - opening) + (height - dh) * opening;
-        context.drawImage(image, sourceX, sourceY + Math.max(0, (sourceHeight - sh) * .36), sourceWidth, sh, 0, dy, width, dh);
-        const edge = Math.min(dh * .12, height * .055);
-        const fade = context.createLinearGradient(0, dy, 0, dy + edge);
-        fade.addColorStop(0, '#030405'); fade.addColorStop(1, '#03040500');
-        context.fillStyle = fade; context.fillRect(0, dy, width, edge);
-        if (dy + dh < height - 2) {
-          const bottom = context.createLinearGradient(0, dy + dh - edge, 0, dy + dh);
-          bottom.addColorStop(0, '#03040500'); bottom.addColorStop(1, '#030405');
-          context.fillStyle = bottom; context.fillRect(0, dy + dh - edge, width, edge);
-        }
-      } else {
-        const scale = Math.max(width / sourceWidth, height / sourceHeight);
-        const sw = width / scale, sh = height / scale;
-        context.drawImage(image, sourceX + (sourceWidth - sw) * .53, sourceY + (sourceHeight - sh) * .5, sw, sh, 0, 0, width, height);
-      }
-      surface.classList.add('is-ready');
-      surface.dataset.frame = String(index);
-      surface.dataset.quality = quality;
-      drawn = index; drawnQuality = quality; dirty = false;
-      let next = -1;
-      FILM_CHAPTERS.forEach((_, i) => { if (index >= sceneFrames[i + 1]) next = i; });
-      if (next !== chapter) { chapter = next; onChapter(next); }
-    };
-    const draw = (index: number) => {
-      const image = cache.get(index);
-      if (image) paint(index, image, image.width, image.height, 0, 0, 'full');
-    };
-    const drawPreview = (index: number) => {
-      if (!previewReady) return;
-      const time = index / (FRAME_COUNT - 1) * FILM_DURATION;
-      let slot = 0;
-      while (slot + 1 < previewSeconds.length && previewSeconds[slot + 1] <= time) slot++;
-      const sample = Math.round(previewSeconds[slot] / FILM_DURATION * (FRAME_COUNT - 1));
-      paint(sample, preview, tileWidth, tileHeight, (slot % 6) * tileWidth, Math.floor(slot / 6) * tileHeight, 'preview');
-    };
-    const trim = () => {
-      if (cache.size <= limit) return;
-      const furthest = [...cache.keys()].filter(i => i !== drawn && i !== target && !sceneFrames.includes(i)).sort((a, b) => Math.abs(b - target) - Math.abs(a - target));
-      while (cache.size > limit && furthest.length) {
-        const index = furthest.shift()!;
-        cache.get(index)?.close(); cache.delete(index);
-      }
-    };
-    const load = async (index: number) => {
-      const controller = new AbortController(); pending.set(index, controller);
-      try {
-        const response = await fetch(path(index), { signal: controller.signal, cache: 'force-cache' });
-        if (!response.ok) throw new Error(`Frame ${response.status}`);
-        const bitmap = await createImageBitmap(await response.blob());
-        if (disposed || (!sceneFrames.includes(index) && Math.abs(index - target) > limit)) bitmap.close();
-        else { cache.set(index, bitmap); trim(); schedule(); }
-      } catch (error) {
-        if (!controller.signal.aborted) failed.add(index);
-      } finally {
-        if (pending.get(index) === controller) pending.delete(index);
-        if (!disposed) pump();
-      }
-    };
-    const pump = () => {
-      if (disposed || !visible || document.hidden) return;
-      // Scene frames stay decoded so a large jump can show the correct place
-      // immediately. Obsolete nearby requests yield to the current frame.
-      for (const [index, controller] of pending) {
-        if (!sceneFrames.includes(index) && Math.abs(index - target) > 4) {
-          pending.delete(index);
-          controller.abort();
-        }
-      }
-      if (!cache.has(target) && !pending.has(target) && pending.size >= 4) {
-        const obsolete = [...pending.keys()].filter(index => index !== target).sort((a, b) => Math.abs(b - target) - Math.abs(a - target))[0];
-        if (obsolete !== undefined) {
-          pending.get(obsolete)?.abort();
-          pending.delete(obsolete);
-        }
-      }
-      // Keep the current scroll neighborhood ahead of distant chapter frames;
-      // prefetching the entire film at the top competes with the visible frame.
-      const nearbyScenes = sceneFrames.filter(index => Math.abs(index - target) <= 16 && !cache.has(index) && !pending.has(index) && !failed.has(index));
-      const wanted = [target, target + direction, target - direction, target + direction * 2, ...nearbyScenes];
-      for (const index of wanted) {
-        if (pending.size >= 4) break;
-        if (index === undefined || index < 0 || index >= FRAME_COUNT || cache.has(index) || pending.has(index) || failed.has(index)) continue;
-        if (sceneFrames.includes(index) && [...pending.keys()].filter(item => sceneFrames.includes(item)).length >= 3) continue;
-        void load(index);
-      }
-    };
-    const update = () => {
+    const update = (now: number) => {
       raf = 0;
       if (disposed || document.hidden) return;
-      const progress = Math.max(0, Math.min(1, (window.scrollY - start) / distance));
-      const next = Math.round(progress * (FRAME_COUNT - 1));
-      if (next !== target) direction = next > target ? 1 : -1;
-      target = next;
+      const progress = Math.max(0, Math.min(1, (scrollY - start) / distance));
+      desired = progress * endTime();
       if (progressBar.current) progressBar.current.style.transform = `scaleX(${progress})`;
-      // Never reveal a future scene early while its actual target frame loads.
-      const earlier = [...cache.keys()].filter(index => index <= target);
-      const nearest = cache.has(target) ? target : earlier.sort((a, b) => b - a)[0];
-      if (nearest !== undefined && target - nearest <= 4) draw(nearest);
-      else if (previewReady) drawPreview(target);
-      else if (nearest !== undefined) draw(nearest);
-      trim(); pump();
+      if (!loaded || !visible || film.seeking) return;
+      const difference = desired - film.currentTime;
+      if (Math.abs(difference) < 1 / 48) return;
+      // Short easing absorbs wheel steps without a long delay behind the scroll.
+      const elapsed = Math.min(.05, Math.max(1 / 60, (now - lastStep) / 1000));
+      const fraction = 1 - Math.exp(-elapsed / .065);
+      const next = Math.abs(difference) < .08 ? desired : film.currentTime + difference * fraction;
+      lastStep = now;
+      film.currentTime = Math.max(0, Math.min(endTime(), next));
     };
     function schedule() { if (!raf && !disposed) raf = requestAnimationFrame(update); }
-    // Observe the fixed stage, not the canvas: changing a canvas bitmap can
-    // itself retrigger ResizeObserver and starve image decoding on some phones.
-    const observer = new ResizeObserver(measure);
-    observer.observe(section.querySelector('.hero-stage') || section);
-    const visibility = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) schedule(); }, { rootMargin: '200px' });
-    visibility.observe(section);
-    preview.onload = () => { previewReady = true; schedule(); };
-    preview.src = `/media/final-v3/preview-${phone ? 'mobile' : 'desktop'}.webp`;
-    measure();
-    window.addEventListener('scroll', schedule, { passive: true });
-    document.addEventListener('visibilitychange', schedule);
-    return () => {
-      disposed = true; cancelAnimationFrame(raf); observer.disconnect(); visibility.disconnect();
-      preview.onload = null;
-      window.removeEventListener('scroll', schedule); document.removeEventListener('visibilitychange', schedule);
-      pending.forEach(controller => controller.abort()); cache.forEach(image => image.close());
+    const ready = () => {
+      if (loaded) return;
+      loaded = true;
+      if (desired < 1 / 24) publish(film.currentTime);
+      else film.currentTime = Math.min(endTime(), desired);
+      schedule();
     };
-  }, [root, canvas, progressBar, reduced, mobile, onChapter]);
+    const seeked = () => {
+      if (!supportsFrameCallback) publish(film.currentTime);
+      schedule();
+    };
+    const failed = () => { if (!disposed) onStatus('error'); };
+    const resume = () => { lastStep = performance.now(); schedule(); };
+    const source = () => {
+      loaded = false; chapter = -2;
+      film.classList.remove('is-ready');
+      onChapter(-1); onStatus('loading');
+      const expected = new URL(media.matches ? FILM_MOBILE : FILM_DESKTOP, location.href).href;
+      // Native <source media> starts the right download from the initial HTML.
+      // Preserve that request instead of restarting it during hydration.
+      if (film.currentSrc && film.currentSrc !== expected) {
+        film.src = expected;
+        film.load();
+      } else if (film.readyState >= 2) ready();
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(section);
+    const visibility = new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      if (visible) resume();
+    }, { rootMargin: '120px' });
+    visibility.observe(section);
+    film.addEventListener('loadeddata', ready);
+    film.addEventListener('seeked', seeked);
+    film.addEventListener('error', failed);
+    window.addEventListener('scroll', schedule, { passive: true });
+    document.addEventListener('visibilitychange', resume);
+    if (supportsFrameCallback) frameCallback = film.requestVideoFrameCallback(presented);
+    film.muted = true;
+    film.preload = 'auto';
+    media.addEventListener('change', source);
+    source();
+    measure();
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(raf);
+      if (frameCallback) film.cancelVideoFrameCallback(frameCallback);
+      observer.disconnect(); visibility.disconnect();
+      window.removeEventListener('scroll', schedule);
+      document.removeEventListener('visibilitychange', resume);
+      film.removeEventListener('loadeddata', ready);
+      film.removeEventListener('seeked', seeked);
+      film.removeEventListener('error', failed);
+      media.removeEventListener('change', source);
+      film.pause(); film.removeAttribute('src'); film.load();
+    };
+  }, [root, video, progressBar, reduced, onChapter, onStatus]);
 }

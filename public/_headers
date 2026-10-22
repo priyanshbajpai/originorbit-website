@@ -25,5 +25,8 @@
 /media/final-v3/*
   Cache-Control: public, max-age=31536000, immutable
 
+/media/hero-v4/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /media/studio-film-v2.webp
   Cache-Control: public, max-age=31536000, immutable
