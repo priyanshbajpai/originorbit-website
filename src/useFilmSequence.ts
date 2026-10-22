@@ -29,6 +29,7 @@ export function useFilmSequence({ root, video, progressBar, reduced, onChapter, 
     let start = 0, distance = 1, desired = 0, chapter = -2;
     let raf = 0, disposed = false, visible = true, loaded = false;
     let lastStep = performance.now(), frameCallback = 0;
+    let loadingTimer = 0;
     const supportsFrameCallback = typeof film.requestVideoFrameCallback === 'function';
     const endTime = () => Math.max(0, (Number.isFinite(film.duration) ? film.duration : FILM_DURATION) - 1 / 24);
 
@@ -39,6 +40,7 @@ export function useFilmSequence({ root, video, progressBar, reduced, onChapter, 
       if (next !== chapter) { chapter = next; onChapter(next); }
       film.dataset.time = time.toFixed(3);
       film.classList.add('is-ready');
+      clearTimeout(loadingTimer);
       onStatus('ready');
     };
     const presented = (_: number, metadata: VideoFrameCallbackMetadata) => {
@@ -71,27 +73,52 @@ export function useFilmSequence({ root, video, progressBar, reduced, onChapter, 
     const ready = () => {
       if (loaded) return;
       loaded = true;
-      if (desired < 1 / 24) publish(film.currentTime);
-      else film.currentTime = Math.min(endTime(), desired);
+      publish(film.currentTime);
+      if (desired >= 1 / 24) film.currentTime = Math.min(endTime(), desired);
       schedule();
     };
     const seeked = () => {
-      if (!supportsFrameCallback) publish(film.currentTime);
+      if (!loaded && film.readyState >= 2) ready();
+      // Some iOS versions omit frame callbacks for paused seeks. seeked still
+      // confirms the decode completed; frame callbacks refine this when available.
+      if (film.readyState >= 2) publish(film.currentTime);
       schedule();
     };
     const failed = () => { if (!disposed) onStatus('error'); };
     const resume = () => { lastStep = performance.now(); schedule(); };
+    // iOS can defer loadeddata indefinitely for an unplayed video, even with
+    // preload=auto. Prime its decoder with muted inline playback, then pause.
+    const activated = () => {
+      film.pause();
+      if (film.readyState >= 2) ready();
+    };
+    const prime = () => {
+      if (loaded || disposed) return;
+      film.muted = true;
+      film.defaultMuted = true;
+      film.play().then(() => { if (!disposed) activated(); }).catch(() => {
+        // Low Power Mode may require a tap. Keep the poster and expose recovery.
+        if (!disposed && !loaded) onStatus('error');
+      });
+    };
+    const metadata = () => {
+      if (!loaded && !film.seeking) film.currentTime = Math.max(.001, desired);
+    };
     const source = () => {
       loaded = false; chapter = -2;
       film.classList.remove('is-ready');
       onChapter(-1); onStatus('loading');
       const expected = new URL(media.matches ? FILM_MOBILE : FILM_DESKTOP, location.href).href;
-      // Native <source media> starts the right download from the initial HTML.
-      // Preserve that request instead of restarting it during hydration.
-      if (film.currentSrc && film.currentSrc !== expected) {
-        film.src = expected;
-        film.load();
-      } else if (film.readyState >= 2) ready();
+      // Select explicitly: older iOS versions do not support <source media>.
+      if (film.src !== expected) { film.src = expected; film.load(); }
+      if (film.readyState >= 2) ready();
+      else prime();
+      clearTimeout(loadingTimer);
+      loadingTimer = window.setTimeout(() => {
+        if (disposed || loaded) return;
+        if (film.readyState >= 2) ready();
+        else onStatus('error');
+      }, 8000);
     };
     const observer = new ResizeObserver(measure);
     observer.observe(section);
@@ -100,7 +127,11 @@ export function useFilmSequence({ root, video, progressBar, reduced, onChapter, 
       if (visible) resume();
     }, { rootMargin: '120px' });
     visibility.observe(section);
+    film.addEventListener('filmretry', source);
     film.addEventListener('loadeddata', ready);
+    film.addEventListener('canplay', ready);
+    film.addEventListener('loadedmetadata', metadata);
+    film.addEventListener('playing', activated);
     film.addEventListener('seeked', seeked);
     film.addEventListener('error', failed);
     window.addEventListener('scroll', schedule, { passive: true });
@@ -114,11 +145,16 @@ export function useFilmSequence({ root, video, progressBar, reduced, onChapter, 
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      clearTimeout(loadingTimer);
       if (frameCallback) film.cancelVideoFrameCallback(frameCallback);
       observer.disconnect(); visibility.disconnect();
       window.removeEventListener('scroll', schedule);
       document.removeEventListener('visibilitychange', resume);
+      film.removeEventListener('filmretry', source);
       film.removeEventListener('loadeddata', ready);
+      film.removeEventListener('canplay', ready);
+      film.removeEventListener('loadedmetadata', metadata);
+      film.removeEventListener('playing', activated);
       film.removeEventListener('seeked', seeked);
       film.removeEventListener('error', failed);
       media.removeEventListener('change', source);

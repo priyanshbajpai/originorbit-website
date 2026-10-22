@@ -14,50 +14,49 @@ export default function Services({ reduced }: { reduced: boolean }) {
     if (!pinned || reduced) return;
     const section = region.current;
     if (!section) return;
-    let raf = 0;
+    const stage = section.querySelector<HTMLElement>('.services-stage');
+    if (!stage) return;
+    let raf = 0, start = 0, distance = 1, visible = false;
     let previousVisible = -1;
-    let previousProgress = -1;
-    const transitions = [0.19, 0.43, 0.67];
-    const transitionLength = 0.07;
     const update = () => {
       raf = 0;
-      const stage = section.querySelector<HTMLElement>('.services-stage');
-      if (!stage) return;
-      const distance = Math.max(1, section.offsetHeight - stage.offsetHeight);
-      const progress = Math.max(0, Math.min(1, -section.getBoundingClientRect().top / distance));
-      if (progress === previousProgress) return;
-      previousProgress = progress;
-      let current = 0;
-      let next = 0;
-      let fade = 0;
-      for (const [index, start] of transitions.entries()) {
-        if (progress >= start + transitionLength) { current = index + 1; next = current; }
-        else if (progress >= start) {
-          current = index;
-          next = index + 1;
-          const phase = (progress - start) / transitionLength;
-          fade = phase * phase * (3 - 2 * phase);
-          break;
-        } else break;
-      }
+      if (!visible) return;
+      const progress = Math.max(0, Math.min(1, (window.scrollY - start) / distance));
+      // Each incoming opaque card slides over the previous one; text never
+      // crossfades over other text. Only compositor transforms change on scroll.
+      const position = Math.max(0, Math.min(3, (progress - .12) / .25));
+      const current = Math.floor(position);
+      const phase = position - current;
       cards.current.forEach((card, index) => {
         if (!card) return;
-        const opacity = index === current ? 1 - fade : index === next ? fade : 0;
-        const opacityValue = String(opacity);
-        if (card.style.opacity !== opacityValue) card.style.opacity = opacityValue;
-        const visibility = opacity > 0.001 ? 'visible' : 'hidden';
-        if (card.style.visibility !== visibility) card.style.visibility = visibility;
-        const zIndex = String(index === next ? 2 : 1);
-        if (card.style.zIndex !== zIndex) card.style.zIndex = zIndex;
+        const y = index <= current ? 0 : index === current + 1 ? (1 - phase) * 100 : 100;
+        card.style.transform = `translate3d(0,${y}%,0)`;
+        card.style.visibility = index === current || index === current + 1 ? 'visible' : 'hidden';
       });
-      const visible = fade >= 0.5 ? next : current;
-      if (visible !== previousVisible) { previousVisible = visible; setActive(visible); }
+      const selected = Math.min(3, current + (phase >= .5 ? 1 : 0));
+      if (selected !== previousVisible) { previousVisible = selected; setActive(selected); }
     };
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
+    const schedule = () => { if (!raf && visible) raf = requestAnimationFrame(update); };
+    const measure = () => {
+      start = section.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(stage).top || '0');
+      distance = Math.max(1, section.offsetHeight - stage.offsetHeight);
+      schedule();
+    };
+    const resize = new ResizeObserver(measure);
+    resize.observe(section); resize.observe(stage);
+    const intersection = new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      if (visible) { measure(); schedule(); }
+    }, { rootMargin: '200px' });
+    intersection.observe(section);
+    measure();
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); cards.current.forEach(card => { if (card) { card.style.opacity = ''; card.style.visibility = ''; card.style.zIndex = ''; } }); };
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(raf); resize.disconnect(); intersection.disconnect();
+      window.removeEventListener('scroll', schedule); window.removeEventListener('resize', measure);
+      cards.current.forEach(card => { if (card) { card.style.transform = ''; card.style.visibility = ''; } });
+    };
   }, [pinned, reduced]);
 
   useEffect(() => {
@@ -78,8 +77,8 @@ export default function Services({ reduced }: { reduced: boolean }) {
     const stage = section.querySelector<HTMLElement>('.services-stage');
     if (!stage) return;
     const distance = Math.max(0, section.offsetHeight - stage.offsetHeight);
-    const destinations = [0.06, 0.32, 0.56, 0.84];
-    window.scrollTo({ top: top + distance * destinations[index], behavior: 'smooth' });
+    const destinations = [0.08, 0.37, 0.62, 0.87];
+    window.scrollTo({ top: top - parseFloat(getComputedStyle(stage).top || '0') + distance * destinations[index], behavior: 'smooth' });
   };
 
   return <section className="services-section" id="services" aria-label="What OriginOrbit creates">

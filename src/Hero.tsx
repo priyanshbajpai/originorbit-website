@@ -29,10 +29,7 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
       <div className={`hero-stage scene-${captionIndex} ${leadVisible ? '' : 'has-progress'}`}>
         <div className="hero-media">
           <picture className="hero-poster"><source media="(max-width: 700px), (max-width: 1000px) and (orientation: portrait)" srcSet="/media/hero-v4/poster-mobile.webp" /><img src={POSTER} alt="A handmade clay astronaut with OriginOrbit logo eyes gathers clay on Mars" width="1920" height="1080" fetchPriority="high" /></picture>
-          {!reduced && <video ref={video} className="hero-film" muted playsInline preload="auto" disablePictureInPicture aria-hidden="true">
-            <source src={FILM_MOBILE} type="video/mp4" media="(prefers-reduced-motion: no-preference) and (max-width: 700px), (prefers-reduced-motion: no-preference) and (max-width: 1000px) and (orientation: portrait)" />
-            <source src={FILM_DESKTOP} type="video/mp4" media="(prefers-reduced-motion: no-preference) and (min-width: 1001px), (prefers-reduced-motion: no-preference) and (min-width: 701px) and (orientation: landscape)" />
-          </video>}
+          {!reduced && <video ref={video} className="hero-film" muted playsInline preload="auto" disablePictureInPicture aria-hidden="true" />}
         </div>
         <div className="hero-shade" />
         <div className={`hero-lead ${leadVisible ? '' : 'is-hidden'}`} aria-hidden={!leadVisible} inert={!leadVisible}>
@@ -44,6 +41,12 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
         {!reduced && captionIndex >= 0 && <p key={captionIndex} className={`film-caption chapter-${captionIndex}`}>{FILM_CHAPTERS[captionIndex].text}</p>}
         {!reduced && <div className="hero-progress" aria-hidden="true"><span ref={progressBar} style={{ transform: 'scaleX(0)' }} /></div>}
         {!reduced && filmStatus === 'loading' && <span className="film-loading" role="status">Loading the film</span>}
+        {!reduced && filmStatus === 'error' && <button className="film-enable" type="button" onClick={() => {
+          const film = video.current;
+          if (!film) return;
+          if (film.error) film.load();
+          film.dispatchEvent(new Event('filmretry'));
+        }}>Enable animation <span aria-hidden="true">↗</span></button>}
         {!reduced && <a className="skip-intro" href="#services">Skip intro <span aria-hidden="true">↓</span></a>}
       </div>
     </section>

@@ -45,12 +45,13 @@ export function Header() {
     let raf = 0;
     const regions = '.hero-story, .film-note, .services-scroll, .service-outro, .partnership, .point-of-view, .approach, .studio-section, .contact-section, .secondary-hero, .embed-section, .secondary-end, .site-footer';
     const sections = Array.from(document.querySelectorAll<HTMLElement>(regions));
+    let bounds: { section: HTMLElement; top: number; bottom: number }[] = [];
     const update = () => {
       raf = 0;
       let next: 'dark' | 'light' | 'clay' = 'dark';
-      for (const section of sections) {
-        const box = section.getBoundingClientRect();
-        if (box.top <= 36 && box.bottom > 36) {
+      const position = window.scrollY + 36;
+      for (const { section, top, bottom } of bounds) {
+        if (top <= position && bottom > position) {
           if (section.matches('.services-scroll, .service-outro, .point-of-view, .studio-section, .embed-section, .secondary-end')) next = 'light';
           if (section.matches('.contact-section')) next = 'clay';
           break;
@@ -59,10 +60,19 @@ export function Header() {
       setTone(current => current === next ? current : next);
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
+    const measure = () => {
+      bounds = sections.map(section => {
+        const box = section.getBoundingClientRect();
+        return { section, top: box.top + window.scrollY, bottom: box.bottom + window.scrollY };
+      });
+      schedule();
+    };
+    const resize = new ResizeObserver(measure);
+    sections.forEach(section => resize.observe(section));
+    measure();
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); };
+    window.addEventListener('resize', measure);
+    return () => { cancelAnimationFrame(raf); resize.disconnect(); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', measure); };
   }, []);
   const links = [
     ['Home', '/#top'], ['What We Create', '/#services'], ['Our Approach', '/#approach'],

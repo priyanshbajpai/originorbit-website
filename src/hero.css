@@ -71,3 +71,5 @@
   .final-film .hero-stage{position:relative}
   .final-film .film-caption,.studio-art .studio-astronaut{animation:none;transform:none}
 }
+
+.final-film .film-enable{position:absolute;z-index:5;left:var(--gutter);bottom:18px;min-height:44px;padding:10px 14px;display:flex;align-items:center;gap:14px;border:1px solid #ffffff75;border-radius:24px;background:#08090be6;color:var(--paper);font-size:12px}

@@ -250,3 +250,13 @@ section,.service-panel{scroll-margin-top:0}
 @media(max-width:700px) and (prefers-reduced-motion:reduce){
   .panel-details,.hero-media{transition:none}
 }
+
+/* Compositor-only service transitions, with stable clipped card boundaries. */
+@media(min-width:760px) and (min-height:650px) and (prefers-reduced-motion:no-preference){
+  .services-scroll{height:350svh}
+  .service-deck{overflow:hidden;isolation:isolate;margin:12px;contain:paint}
+  .service-panel,.service-panel.is-active{inset:0;opacity:1;transition:none;will-change:transform;transform:translate3d(0,100%,0);contain:paint}
+  .service-panel:first-child{transform:translate3d(0,0,0);visibility:visible}
+  .service-panel:nth-child(1){z-index:1}.service-panel:nth-child(2){z-index:2}.service-panel:nth-child(3){z-index:3}.service-panel:nth-child(4){z-index:4}
+  .panel-art{filter:none}
+}
