@@ -91,7 +91,7 @@ export function useFilmSequence({ root, canvas, progressBar, reduced, mobile, on
       surface.dataset.quality = quality;
       drawn = index; drawnQuality = quality; dirty = false;
       let next = -1;
-      FILM_CHAPTERS.forEach((item, i) => { if (time >= item.time) next = i; });
+      FILM_CHAPTERS.forEach((_, i) => { if (index >= sceneFrames[i + 1]) next = i; });
       if (next !== chapter) { chapter = next; onChapter(next); }
     };
     const draw = (index: number) => {
