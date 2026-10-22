@@ -18,3 +18,9 @@
 
 /media/final-v1/*
   Cache-Control: public, max-age=31536000, immutable
+
+/media/final-v2/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/media/studio-film-v2.webp
+  Cache-Control: public, max-age=31536000, immutable

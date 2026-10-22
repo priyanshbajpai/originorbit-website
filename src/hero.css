@@ -1,5 +1,5 @@
 /* Final film: one story and one copy sequence, composed for each screen. */
-.final-film.hero-story{height:400svh;background:#030405}
+.final-film.hero-story{height:280svh;background:#030405}
 .final-film .hero-stage{height:100svh;min-height:0;background:#030405}
 .final-film .hero-media,.final-film .hero-stage.has-progress .hero-media{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;overflow:hidden;mask-image:none;-webkit-mask-image:none;box-shadow:none;transition:none}
 .final-film .hero-poster,.final-film .hero-poster img,.final-film .hero-sequence{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -18,7 +18,7 @@
   .final-film .hero-lead h1{font-size:clamp(56px,7.7vw,76px)}
 }
 @media(max-width:700px), (max-width:1000px) and (orientation:portrait){
-  .final-film.hero-story{height:350svh}
+  .final-film.hero-story{height:260svh}
   .final-film .hero-poster img{object-fit:fill}
   .final-film .hero-shade{background:linear-gradient(180deg,transparent 65%,#03040544 100%);opacity:1}
   .final-film .has-progress .hero-shade{opacity:1}
@@ -53,3 +53,14 @@
 @media(min-width:701px) and (max-width:1000px) and (orientation:portrait){.final-film .hero-lead{width:min(75%,570px);top:120px}.final-film .hero-lead h1{font-size:60px}.final-film .hero-lead>p{font-size:18px}.final-film .hero-lead .eyebrow{font-size:11px}.final-film .hero-actions .button,.final-film .hero-secondary{font-size:15px;min-height:48px}.final-film .film-caption{font-size:56px;top:125px}}
 
 .final-film .hero-sequence{transition:none}
+
+/* The stills carry the restrained grade; the source film remains available in replay. */
+.final-film .film-caption{isolation:isolate;top:clamp(180px,24svh,265px);bottom:auto;text-shadow:0 2px 22px #000b}
+.final-film .film-caption::before{content:"";position:absolute;z-index:-1;inset:-24px -54px -24px -18px;background:linear-gradient(90deg,#030405eb 0%,#030405b5 58%,transparent 100%);pointer-events:none}
+.studio-art .studio-film-frame{align-self:stretch;position:relative;aspect-ratio:1.25;overflow:hidden;border:1px solid #ffffff66;box-shadow:0 28px 45px #081e7840}
+.studio-art .studio-film-frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+@media(max-width:700px), (max-width:1000px) and (orientation:portrait){
+  .final-film .film-caption{top:clamp(110px,14svh,150px);bottom:auto}
+  .final-film .film-caption::before{inset:-18px -26px -18px -8px;background:linear-gradient(90deg,#030405e0,#03040555 80%,transparent)}
+  .studio-art .studio-film-frame{width:100%;max-width:540px;align-self:center;aspect-ratio:1.25}
+}

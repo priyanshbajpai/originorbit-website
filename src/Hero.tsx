@@ -3,7 +3,7 @@ import { FILM_DESKTOP, FILM_MOBILE } from './site-data';
 import { Arrow, useMediaQuery } from './Shared';
 import { FILM_CHAPTERS, useFilmSequence } from './useFilmSequence';
 
-const POSTER = '/media/final-v1/poster-desktop.webp';
+const POSTER = '/media/final-v2/poster-desktop.webp';
 export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: boolean }) {
   const compact = useMediaQuery('(max-width: 700px), (max-width: 1000px) and (orientation: portrait)');
   const root = useRef<HTMLElement>(null);
@@ -27,7 +27,7 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
     <section className={`hero-story final-film ${reduced ? 'is-reduced' : ''}`} id="top" ref={root} aria-label="OriginOrbit creative studio">
       <div className={`hero-stage ${leadVisible ? '' : 'has-progress'}`}>
         <div className="hero-media">
-          <picture className="hero-poster"><source media="(max-width: 700px), (max-width: 1000px) and (orientation: portrait)" srcSet="/media/final-v1/poster-mobile.webp" /><img src={POSTER} alt="A handmade clay astronaut with OriginOrbit logo eyes gathers clay on Mars" width="1440" height="810" fetchPriority="high" /></picture>
+          <picture className="hero-poster"><source media="(max-width: 700px), (max-width: 1000px) and (orientation: portrait)" srcSet="/media/final-v2/poster-mobile.webp" /><img src={POSTER} alt="A handmade clay astronaut with OriginOrbit logo eyes gathers clay on Mars" width="1440" height="810" fetchPriority="high" /></picture>
           {!reduced && <canvas ref={canvas} className="hero-sequence" aria-hidden="true" />}
         </div>
         <div className="hero-shade" />
