@@ -1,5 +1,15 @@
 # OriginOrbit launch package
 
+## Film refinement — 22 October 2026
+
+- Production deploy: `6ad9f95b06905e67b2b1f493` at https://originorbit.studio/
+- Source commit: `8ba735a` on GitHub `main`
+- Versioned `final-v2` scroll media has a restrained grade, sharper desktop frames, and phone frames cropped from the 4K source before compression
+- The loader prioritizes the current frame and preloads scene stills; captions follow the frame actually displayed
+- The scroll journey is shorter on desktop and mobile, and the Studio section uses an exact still of the film astronaut
+- Verified the live final frame and caption in phone-sized WebKit and desktop Chromium, with no page errors or horizontal overflow
+- Publishing remains manual through the Netlify CLI; pushing to GitHub alone does not update the live site
+
 ## Final film integration — 22 October 2026
 
 - Production deploy: `6ad9ec3108c5b581652ef106` at https://originorbit.studio/
