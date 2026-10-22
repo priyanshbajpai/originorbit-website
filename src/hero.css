@@ -1,0 +1,55 @@
+/* Final film: one story and one copy sequence, composed for each screen. */
+.final-film.hero-story{height:400svh;background:#030405}
+.final-film .hero-stage{height:100svh;min-height:0;background:#030405}
+.final-film .hero-media,.final-film .hero-stage.has-progress .hero-media{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;overflow:hidden;mask-image:none;-webkit-mask-image:none;box-shadow:none;transition:none}
+.final-film .hero-poster,.final-film .hero-poster img,.final-film .hero-sequence{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.final-film .hero-shade{background:linear-gradient(90deg,#0304059c 0%,#03040538 43%,transparent 70%),linear-gradient(0deg,#03040566,transparent 22%);transition:opacity .4s ease;opacity:1}
+.final-film .has-progress .hero-shade{opacity:.55}
+.final-film .hero-lead{top:clamp(138px,21svh,220px);width:min(60%,800px)}
+.final-film .hero-lead h1{font-size:clamp(62px,7.1vw,106px);max-width:12ch;line-height:.98}
+.final-film .hero-lead>p{max-width:460px;font-size:clamp(16px,1.3vw,19px)}
+.final-film .film-caption{left:var(--gutter);bottom:clamp(88px,13svh,140px);top:auto;max-width:11ch;font-size:clamp(38px,4.5vw,66px);line-height:1.04;animation:film-copy-in .35s ease both;text-shadow:0 2px 30px #0008}
+.final-film .skip-intro{bottom:22px;font-size:13px}
+.final-film .hero-progress{height:2px}
+.final-film.is-reduced{height:100svh}
+@keyframes film-copy-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:701px) and (max-width:1000px){
+  .final-film .hero-lead{width:70%;top:clamp(132px,18svh,205px)}
+  .final-film .hero-lead h1{font-size:clamp(56px,7.7vw,76px)}
+}
+@media(max-width:700px), (max-width:1000px) and (orientation:portrait){
+  .final-film.hero-story{height:350svh}
+  .final-film .hero-poster img{object-fit:fill}
+  .final-film .hero-shade{background:linear-gradient(180deg,transparent 65%,#03040544 100%);opacity:1}
+  .final-film .has-progress .hero-shade{opacity:1}
+  .final-film .hero-lead{top:clamp(94px,12svh,118px);width:calc(100% - var(--gutter)*2)}
+  .final-film .hero-lead .eyebrow{font-size:9px;letter-spacing:.12em}
+  .final-film .hero-lead h1{font-size:clamp(39px,10.4vw,60px);line-height:1;max-width:12ch;margin:17px 0 16px}
+  .final-film .hero-lead>p{font-size:14px;line-height:1.45;max-width:36ch}
+  .final-film .hero-actions{display:flex;flex-wrap:nowrap;gap:18px;margin-top:19px}
+  .final-film .hero-actions .button{min-height:44px;font-size:12px;padding:12px 15px;gap:12px}
+  .final-film .hero-secondary{min-height:44px;font-size:12px;gap:6px}
+  .final-film .film-caption{top:clamp(110px,14svh,150px);bottom:auto;max-width:12ch;font-size:clamp(36px,9.6vw,52px)}
+  .final-film .skip-intro{bottom:16px;font-size:12px;gap:9px;text-shadow:0 1px 8px #000}
+  .final-film.is-reduced{height:100svh}
+}
+@media(max-width:700px) and (max-height:730px){
+  .final-film .hero-lead{top:84px}
+  .final-film .hero-lead h1{font-size:clamp(35px,9.6vw,44px);margin:12px 0}
+  .final-film .hero-lead>p{font-size:13px;line-height:1.4;max-width:37ch}
+  .final-film .hero-actions{margin-top:13px}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .final-film .hero-lead{top:90px;width:58%}
+  .final-film .hero-lead .eyebrow{font-size:9px}
+  .final-film .hero-lead h1{font-size:38px;margin:12px 0}
+  .final-film .hero-lead>p{font-size:13px;max-width:42ch}
+  .final-film .hero-actions{margin-top:12px}
+  .final-film .hero-actions .button,.final-film .hero-secondary{min-height:40px;font-size:12px}
+  .final-film .film-caption{font-size:36px;bottom:52px}
+}
+@media(prefers-reduced-motion:reduce){.final-film.hero-story{height:100svh}.final-film .hero-stage{position:relative}.final-film .film-caption{animation:none}}
+
+@media(min-width:701px) and (max-width:1000px) and (orientation:portrait){.final-film .hero-lead{width:min(75%,570px);top:120px}.final-film .hero-lead h1{font-size:60px}.final-film .hero-lead>p{font-size:18px}.final-film .hero-lead .eyebrow{font-size:11px}.final-film .hero-actions .button,.final-film .hero-secondary{font-size:15px;min-height:48px}.final-film .film-caption{font-size:56px;top:125px}}
+
+.final-film .hero-sequence{transition:none}

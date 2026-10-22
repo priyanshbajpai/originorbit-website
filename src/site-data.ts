@@ -2,8 +2,8 @@ export const CONTACT_EMAIL = 'contact@originorbit.studio';
 export const PROJECT_FORM_URL = 'https://forms.gle/2AEPuZ9GTGucZqdc8';
 export const PROJECT_FORM_EMBED = 'https://docs.google.com/forms/d/e/1FAIpQLSd34SvK3Iuel89PtjCPXaPWFEy5wZg5jAw321R4wJkimVZJIQ/viewform?embedded=true';
 export const BOOKING_URL = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ204E6nelUbcxVY5LtaTYkGAaJwxGYyBYKeYv5wyHpWt64UJOQnqMGUf1fptEV5uOnT0stExPx3?gv=true';
-export const FILM_DESKTOP = '/media/origin-orbit-film-v4.mp4';
-export const FILM_MOBILE = '/media/origin-orbit-film-v5-mobile.mp4';
+export const FILM_DESKTOP = '/media/final-v1/film-desktop.mp4';
+export const FILM_MOBILE = '/media/final-v1/film-mobile.mp4';
 
 export const services = [
   {

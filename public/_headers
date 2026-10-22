@@ -15,3 +15,6 @@
 
 /media/scroll-frames-mobile/*
   Cache-Control: public, max-age=3600
+
+/media/final-v1/*
+  Cache-Control: public, max-age=31536000, immutable
