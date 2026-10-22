@@ -3,12 +3,12 @@
 .final-film .hero-stage{height:100svh;min-height:0;background:#030405}
 .final-film .hero-media,.final-film .hero-stage.has-progress .hero-media{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;overflow:hidden;mask-image:none;-webkit-mask-image:none;box-shadow:none;transition:none}
 .final-film .hero-poster,.final-film .hero-poster img,.final-film .hero-sequence{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.final-film .hero-shade{background:linear-gradient(90deg,#0304059c 0%,#03040538 43%,transparent 70%),linear-gradient(0deg,#03040566,transparent 22%);transition:opacity .4s ease;opacity:1}
-.final-film .has-progress .hero-shade{opacity:.55}
+.final-film .hero-shade{background:linear-gradient(90deg,#030405b8 0%,#0304058c 27%,#03040516 57%,transparent 77%),linear-gradient(0deg,#03040542,transparent 22%);transition:opacity .35s ease;opacity:1}
+.final-film .has-progress .hero-shade{opacity:.88}
 .final-film .hero-lead{top:clamp(138px,21svh,220px);width:min(60%,800px)}
 .final-film .hero-lead h1{font-size:clamp(62px,7.1vw,106px);max-width:12ch;line-height:.98}
 .final-film .hero-lead>p{max-width:460px;font-size:clamp(16px,1.3vw,19px)}
-.final-film .film-caption{left:var(--gutter);bottom:clamp(88px,13svh,140px);top:auto;max-width:11ch;font-size:clamp(38px,4.5vw,66px);line-height:1.04;animation:film-copy-in .35s ease both;text-shadow:0 2px 30px #0008}
+.final-film .film-caption{left:var(--gutter);bottom:clamp(88px,13svh,140px);top:auto;max-width:14ch;font-size:clamp(38px,4.5vw,66px);line-height:1.04;animation:film-copy-in .35s ease both;text-shadow:0 2px 18px #0009;color:#f4eee8}
 .final-film .skip-intro{bottom:22px;font-size:13px}
 .final-film .hero-progress{height:2px}
 .final-film.is-reduced{height:100svh}
@@ -20,7 +20,7 @@
 @media(max-width:700px), (max-width:1000px) and (orientation:portrait){
   .final-film.hero-story{height:260svh}
   .final-film .hero-poster img{object-fit:fill}
-  .final-film .hero-shade{background:linear-gradient(180deg,transparent 65%,#03040544 100%);opacity:1}
+  .final-film .hero-shade{background:linear-gradient(180deg,#030405d9 0%,#030405ad 20%,#03040520 49%,transparent 70%);opacity:1}
   .final-film .has-progress .hero-shade{opacity:1}
   .final-film .hero-lead{top:clamp(94px,12svh,118px);width:calc(100% - var(--gutter)*2)}
   .final-film .hero-lead .eyebrow{font-size:9px;letter-spacing:.12em}
@@ -29,7 +29,7 @@
   .final-film .hero-actions{display:flex;flex-wrap:nowrap;gap:18px;margin-top:19px}
   .final-film .hero-actions .button{min-height:44px;font-size:12px;padding:12px 15px;gap:12px}
   .final-film .hero-secondary{min-height:44px;font-size:12px;gap:6px}
-  .final-film .film-caption{top:clamp(110px,14svh,150px);bottom:auto;max-width:12ch;font-size:clamp(36px,9.6vw,52px)}
+  .final-film .film-caption{top:clamp(110px,14svh,150px);bottom:auto;max-width:13ch;font-size:clamp(33px,8.9vw,49px)}
   .final-film .skip-intro{bottom:16px;font-size:12px;gap:9px;text-shadow:0 1px 8px #000}
   .final-film.is-reduced{height:100svh}
 }
@@ -54,14 +54,18 @@
 
 .final-film .hero-sequence{transition:none}
 
-/* The stills carry the restrained grade; the source film remains available in replay. */
-.final-film .film-caption{isolation:isolate;top:clamp(180px,24svh,265px);bottom:auto;text-shadow:0 2px 22px #000b}
-.final-film .film-caption::before{content:"";position:absolute;z-index:-1;inset:-24px -54px -24px -18px;background:linear-gradient(90deg,#030405eb 0%,#030405b5 58%,transparent 100%);pointer-events:none}
+/* The movie carries the grade; the full-stage veil supports text without a highlight block. */
+.final-film .film-caption{top:clamp(180px,24svh,265px);bottom:auto}
+.final-film .film-caption.chapter-1{max-width:10ch}
+.final-film .film-caption.chapter-2,.final-film .film-caption.chapter-3{top:auto;bottom:clamp(83px,11svh,125px);max-width:11ch;font-size:clamp(38px,4.2vw,62px)}
+.final-film .hero-stage.scene-2 .hero-shade,.final-film .hero-stage.scene-3 .hero-shade{background:linear-gradient(90deg,#0304058f,transparent 52%),linear-gradient(0deg,#030405c9 0%,#0304055a 33%,transparent 58%)}
+.film-dialog video{filter:brightness(.87) saturate(.93)}
 .studio-art .studio-astronaut{display:block;width:min(83%,520px);height:auto;max-height:560px;object-fit:contain;filter:drop-shadow(0 26px 26px #071d6c55);transform-origin:50% 48%;animation:studio-drift 7s ease-in-out infinite}
 @keyframes studio-drift{0%,100%{transform:translate3d(0,7px,0) rotate(-1.5deg)}50%{transform:translate3d(0,-13px,0) rotate(1deg)}}
 @media(max-width:700px), (max-width:1000px) and (orientation:portrait){
   .final-film .film-caption{top:clamp(110px,14svh,150px);bottom:auto}
-  .final-film .film-caption::before{inset:-18px -26px -18px -8px;background:linear-gradient(90deg,#030405e0,#03040555 80%,transparent)}
+  .final-film .film-caption.chapter-1,.final-film .film-caption.chapter-2,.final-film .film-caption.chapter-3{top:clamp(110px,14svh,150px);bottom:auto;max-width:13ch;font-size:clamp(33px,8.9vw,49px)}
+  .final-film .hero-stage.scene-2 .hero-shade,.final-film .hero-stage.scene-3 .hero-shade{background:linear-gradient(180deg,#030405df 0%,#030405a8 19%,#03040519 49%,transparent 70%)}
   .studio-art .studio-astronaut{width:min(78vw,350px);max-height:360px}
 }
 @media(prefers-reduced-motion:reduce){.studio-art .studio-astronaut{animation:none;transform:none}}

@@ -1,13 +1,12 @@
 import { useEffect, type RefObject } from 'react';
 
-export const FILM_DURATION = 19.834;
-export const FRAME_COUNT = 239;
+export const FILM_DURATION = 20;
+export const FRAME_COUNT = 240;
 export const FILM_CHAPTERS = [
-  { time: 3.1, text: 'Every idea has an origin' },
-  { time: 5.3, text: 'Take it somewhere unexpected' },
-  { time: 9.3, text: 'Find a place to make it' },
-  { time: 13.3, text: 'Shape it by hand' },
-  { time: 17.5, text: 'Make something worth remembering' },
+  { time: 3.2, text: 'Every idea has an origin' },
+  { time: 5.0, text: 'Take it somewhere unexpected' },
+  { time: 10.9, text: 'Give it shape by hand' },
+  { time: 16.3, text: 'Make something worth remembering' },
 ];
 const sceneFrames = [0, ...FILM_CHAPTERS.map(item => Math.round(item.time / FILM_DURATION * (FRAME_COUNT - 1))), FRAME_COUNT - 1];
 
@@ -35,7 +34,7 @@ export function useFilmSequence({ root, canvas, progressBar, reduced, mobile, on
     let target = 0, drawn = -1, direction = 1, chapter = -2;
     let raf = 0, disposed = false, visible = true, dirty = true;
     let width = 0, height = 0, start = 0, distance = 1;
-    const path = (index: number) => `/media/final-v2/${phone ? 'mobile' : 'desktop'}/${String(index).padStart(3, '0')}.webp`;
+    const path = (index: number) => `/media/final-v3/${phone ? 'mobile' : 'desktop'}/${String(index).padStart(3, '0')}.webp`;
     const measure = () => {
       const bounds = surface.getBoundingClientRect();
       const ratio = Math.min(devicePixelRatio || 1, phone ? 2 : 1.5, (phone ? 960 : 1800) / Math.max(1, bounds.width));
@@ -63,7 +62,11 @@ export function useFilmSequence({ root, canvas, progressBar, reduced, mobile, on
         const available = height * (.75 - opening * .21);
         const dh = Math.min(imageHeight, available);
         const sh = dh * image.width / width;
-        const restingTop = Math.max(height * .27, height * .54 - dh / 2);
+        const centeredTop = Math.max(height * .27, height * .54 - dh / 2);
+        // The close sculpting shots settle toward the bottom of the viewport,
+        // so the flower does not read as a detached film rectangle on a phone.
+        const settling = Math.max(0, Math.min(1, (time - 10) / 4));
+        const restingTop = centeredTop * (1 - settling) + Math.max(0, height - dh) * settling;
         const dy = restingTop * (1 - opening) + (height - dh) * opening;
         context.drawImage(image, 0, Math.max(0, (image.height - sh) * .36), image.width, sh, 0, dy, width, dh);
         const edge = Math.min(dh * .12, height * .055);
@@ -127,8 +130,10 @@ export function useFilmSequence({ root, canvas, progressBar, reduced, mobile, on
           pending.delete(obsolete);
         }
       }
-      const upcomingScenes = sceneFrames.filter(index => !cache.has(index) && !pending.has(index) && !failed.has(index)).sort((a, b) => Math.abs(a - target) - Math.abs(b - target));
-      const wanted = [target, target + direction, upcomingScenes[0], upcomingScenes[1], target - direction, target + direction * 2, ...upcomingScenes.slice(2)];
+      // Keep the current scroll neighborhood ahead of distant chapter frames;
+      // prefetching the entire film at the top competes with the visible frame.
+      const nearbyScenes = sceneFrames.filter(index => Math.abs(index - target) <= 16 && !cache.has(index) && !pending.has(index) && !failed.has(index));
+      const wanted = [target, target + direction, target - direction, target + direction * 2, ...nearbyScenes];
       for (const index of wanted) {
         if (pending.size >= 4) break;
         if (index === undefined || index < 0 || index >= FRAME_COUNT || cache.has(index) || pending.has(index) || failed.has(index)) continue;

@@ -1,0 +1,19 @@
+{
+  "clipDurations": [
+    10,
+    10
+  ],
+  "duration": 20,
+  "frameCount": 240,
+  "sampleFPS": 12,
+  "sourceHeight": 2160,
+  "sourceWidth": 3840,
+  "framesPerSecond": 12,
+  "desktopWidth": 1800,
+  "mobileWidth": 960,
+  "grade": {
+    "brightness": 0.87,
+    "saturation": 0.93
+  },
+  "source": "Two supplied 4K-upscaled clay clips"
+}
