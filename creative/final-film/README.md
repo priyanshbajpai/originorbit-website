@@ -34,8 +34,8 @@ Captions follow the rendered frame, rather than advancing ahead of a still-loadi
 
 ## Verification
 
-Browser plugin not available; regular Playwright Chromium used as the testing fallback.
+Browser plugin not available; regular Playwright Chromium and WebKit used as the testing fallback.
 
-Checked 1440×900, 1366×768, 768×1024, 390×844 and 375×667 layouts. Confirmed no horizontal overflow or page errors; final frame 238 reachable; reverse scrolling returns to frame 0; Skip intro works; mobile services start closed and toggle closed again; replay starts with sound controls and Escape closes it; reduced-motion mode requests zero scroll frames. Production TypeScript / Vite build and prerender pass.
+Checked 1440×900, 1366×768, 768×1024, 390×844 and 375×667 layouts. Confirmed no horizontal overflow or page errors; final frame 238 reachable; reverse scrolling returns to frame 0; Skip intro works; mobile services start closed and toggle closed again; replay starts with sound controls and Escape closes it; reduced-motion mode requests zero scroll frames. Production TypeScript / Vite build and prerender pass. The prerendered production build also passed the interaction checks in WebKit.
 
 A physical iPhone Safari check remains necessary for device-specific performance.

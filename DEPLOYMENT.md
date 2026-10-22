@@ -1,5 +1,17 @@
 # OriginOrbit launch package
 
+## Final film integration — 22 October 2026
+
+- Production deploy: `6ad9ec3108c5b581652ef106` at https://originorbit.studio/
+- Source integration commit: `b3a7510` on GitHub `main`
+- Final supplied 19.834-second film replaces the old footage; optimized replays retain the original edit and audio
+- Desktop uses immersive framing; phones and portrait tablets use scene-aware framing with the same approved hero headline and synchronized chapter copy
+- Scroll media now has 239 WebP frames per device variant and a bounded directional decode cache; movie files load only on replay
+- Verified Chromium and WebKit forward/reverse scrolling, replay, mobile service expansion/collapse, reduced motion, production hydration, and responsive layouts
+- Published using the existing authenticated Netlify CLI session after the connector upload returned HTTP 500
+- `.netlify/` remains ignored; `netlify.toml` now declares the existing npm build and `dist` output
+- A physical iPhone check remains for device-specific performance
+
 ## Live status — 22 October 2026
 
 - Production site: https://originorbit.studio/
