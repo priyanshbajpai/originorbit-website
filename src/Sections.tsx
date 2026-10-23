@@ -2,7 +2,7 @@ import { CONTACT_EMAIL, steps } from './site-data';
 import { Arrow, BrandMark, Clay } from './Shared';
 
 export function PointOfView() {
-  return <section className="point-of-view section-pad" id="point-of-view"><span className="eyebrow">OUR POINT OF VIEW</span><div className="point-grid"><h2>The idea comes first<br /><em>The medium follows</em></h2><div><p>Memorable creative work begins with curiosity, perspective and the willingness to explore something unexpected.</p><p>Technology expands what we can make. It doesn’t replace the thinking behind it.</p><p>We bring creative direction, experimentation and AI-native production together to make experiences worth remembering.</p></div></div><div className="point-signature"><span className="point-aside">Imagination is a working material</span><BrandMark tone="dark" /></div></section>;
+  return <section className="point-of-view section-pad" id="point-of-view"><span className="eyebrow">OUR POINT OF VIEW</span><div className="point-grid"><h2>The idea comes first<br /><em>The medium follows</em></h2><div><p>Memorable creative work begins with curiosity, perspective and the willingness to explore something unexpected.</p><p>Technology expands what we can make. It doesn’t replace the thinking behind it.</p><p>We bring creative direction, experimentation and AI-native production together, then build workflows that help good ideas stay coherent as they grow.</p></div></div><div className="point-signature"><span className="point-aside">Imagination is a working material</span><BrandMark tone="dark" /></div></section>;
 }
 
 export function Approach({ reduced }: { reduced: boolean }) {

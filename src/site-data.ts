@@ -34,6 +34,13 @@ export const services = [
     deliverables: ['Creative concepts', 'Art direction', 'Campaign development', 'Multi-format creative'],
     alt: 'Handmade cream clay compass with an orange arrow and cobalt markers',
   },
+  {
+    title: 'Creative Systems & Workflows', short: 'Systems', art: 'workflows', theme: 'systems',
+    line: 'Make the creative process repeatable.',
+    description: 'We design brand-specific, AI-assisted workflows that turn a clear creative direction into consistent imagery, motion and campaign assets your team can keep making.',
+    deliverables: ['Image & video workflows', 'Brand asset templates', 'Prompt & style systems', 'Creative production automations'],
+    alt: 'Handmade cream and cobalt clay creative press producing a continuous orange ribbon of image, film and pattern tiles',
+  },
 ] as const;
 
 export const steps = [

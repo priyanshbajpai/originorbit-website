@@ -35,7 +35,7 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
         <div className={`hero-lead ${leadVisible ? '' : 'is-hidden'}`} aria-hidden={!leadVisible} inert={!leadVisible}>
           <span className="eyebrow">ORIGIN &amp; ORBIT — AI-NATIVE CREATIVE STUDIO</span>
           <h1>Ideas made<br />impossible to ignore</h1>
-          <p>We create distinctive imagery, films, campaigns and interactive experiences for brands that want to stand apart.</p>
+          <p>We make imagery, films, campaigns and interactive experiences—and build creative systems that help brands keep creating.</p>
           <div className="hero-actions"><a className="button button-orange" href="#services">Explore services <Arrow /></a><a className="hero-secondary" href="/start-a-project/">Start a project <Arrow /></a></div>
         </div>
         {!reduced && captionIndex >= 0 && <p key={captionIndex} className={`film-caption chapter-${captionIndex}`}>{FILM_CHAPTERS[captionIndex].text}</p>}

@@ -73,6 +73,11 @@ section,.service-panel{scroll-margin-top:0}
 .hero-progress span{background:repeating-linear-gradient(90deg,var(--orange) 0 13px,transparent 13px 17px)}
 .panel-top{border-bottom-style:dashed}.panel-bottom{border-top-style:dashed}
 .panel-images{background:#a83f24}
+.panel-systems{background:#17295b}
+@media(min-width:760px){.panel-systems .panel-art{right:1%}}
+@media(min-width:760px) and (max-width:1099px) and (min-height:650px) and (max-height:899px){
+  .panel-systems .panel-art{right:0;bottom:-1%;width:80%;height:55%}
+}
 .service-rail .rail-hint{letter-spacing:.1em}
 .button:focus-visible,.site-nav a:focus-visible,.service-index button:focus-visible{outline-color:var(--cobalt)}
 @media(max-width:1050px){.site-header[data-tone="light"] .site-nav{background:var(--paper)}.site-header[data-tone="light"] .site-nav>a{border-color:#07080b33}.site-header[data-tone="clay"] .site-nav{background:var(--clay-deep)}}
@@ -253,7 +258,7 @@ section,.service-panel{scroll-margin-top:0}
 
 /* Compositor-only service transitions, with stable clipped card boundaries. */
 @media(min-width:760px) and (min-height:650px) and (prefers-reduced-motion:no-preference){
-  .services-scroll{height:350svh}
+  .services-scroll{height:440svh}
   .service-deck{overflow:hidden;isolation:isolate;margin:12px;contain:paint}
   .service-panel,.service-panel.is-active{inset:0;opacity:1;transition:none;will-change:transform;transform:translate3d(0,100%,0);contain:paint}
   .service-panel:first-child{transform:translate3d(0,0,0);visibility:visible}
