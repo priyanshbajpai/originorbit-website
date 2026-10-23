@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { services } from './site-data';
 import { Arrow, BrandMark, Clay, useMediaQuery } from './Shared';
 
@@ -82,16 +82,16 @@ export default function Services({ reduced }: { reduced: boolean }) {
     window.scrollTo({ top: top - parseFloat(getComputedStyle(stage).top || '0') + distance * progress, behavior: 'smooth' });
   };
 
-  return <section className="services-section" id="services" aria-label="What OriginOrbit creates">
+  return <section className="services-section" id="services" aria-label="What Origin & Orbit creates">
     <div className="services-scroll" ref={region}>
       <div className="services-stage">
         <div className="service-rail">
-          <div className="service-intro"><span className="eyebrow">WHAT WE CREATE</span><BrandMark tone="dark" className="service-mark" /><h2>One idea<br /><em>Many expressions</em></h2><p>From a single image to an interactive experience or a repeatable creative workflow, we find the right form for the idea.</p></div>
+          <div className="service-intro"><span className="eyebrow">WHAT WE CREATE</span><BrandMark tone="dark" className="service-mark" /><h2>One idea<br />{' '}<em>Many expressions</em></h2><p>From a single image to an interactive experience or a repeatable creative workflow, we find the right form for the idea.</p></div>
           <div className="service-index" role="group" aria-label="Choose a service">{services.map((service, index) => <button key={service.title} type="button" className={active === index ? 'is-active' : ''} onClick={() => goTo(index)} aria-pressed={active === index}><span>0{index + 1}</span><strong>{service.title}</strong><Arrow diagonal={false} /></button>)}</div>
           <span className="rail-hint">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></span>
         </div>
         <div className="service-deck">
-          {services.map((service, index) => <article key={service.title} data-index={index} ref={node => { cards.current[index] = node; }} className={`service-panel panel-${service.theme} ${active === index ? 'is-active' : ''} ${openService === index ? 'is-mobile-open' : ''}`} aria-hidden={pinned && !reduced && active !== index} inert={pinned && !reduced && active !== index}>
+          {services.map((service, index) => <article key={service.title} data-index={index} ref={node => { cards.current[index] = node; }} className={`service-panel panel-${service.theme} ${active === index ? 'is-active' : ''} ${openService === index ? 'is-mobile-open' : ''}`} style={{ '--panel-order': index + 1 } as CSSProperties} aria-hidden={pinned && !reduced && active !== index} inert={pinned && !reduced && active !== index}>
             <button className="panel-top" type="button" aria-expanded={compact ? openService === index : undefined} aria-controls={`service-details-${index}`} onClick={() => { if (compact) setOpenService(previous => previous === index ? null : index); else if (pinned && !reduced) goTo(index); else setActive(index); }}><span>0{index + 1} / 0{services.length}</span><span><span className="panel-top-short">{service.short}</span><span className="panel-top-full">{service.title}</span> <Arrow /></span></button>
             <div className="panel-details" id={`service-details-${index}`} inert={compact && openService !== index}><div className="panel-details-inner">
               <div className="panel-body"><div className="panel-copy"><h3>{service.title}</h3><p className="panel-line">{service.line}</p><p className="panel-description">{service.description}</p></div><Clay name={service.art} alt={service.alt} className="panel-art" loading="eager" /></div>
@@ -102,6 +102,6 @@ export default function Services({ reduced }: { reduced: boolean }) {
       </div>
     </div>
     <div className="service-outro"><p>Have something in mind? <strong>Let’s create it</strong></p><a className="button button-ink" href="/start-a-project/">Start a project <Arrow /></a></div>
-    <div className="partnership"><span className="eyebrow">ONGOING CREATIVE PARTNERSHIP</span><h3>Not just one project<br />A creative partner</h3><p>For brands that need support beyond a single campaign, we can create ongoing content, guide launches and build creative workflows that keep every new asset on direction.</p><a className="text-link" href="/start-a-project/">Discuss a partnership <Arrow /></a></div>
+    <div className="partnership"><span className="eyebrow">ONGOING CREATIVE PARTNERSHIP</span><h3>Not just one project<br />{' '}A creative partner</h3><p>For brands that need support beyond a single campaign, we can create ongoing content, guide launches and build creative workflows that keep new work consistent with the brand’s creative direction.</p><a className="text-link" href="/start-a-project/">Discuss a partnership <Arrow /></a></div>
   </section>;
 }

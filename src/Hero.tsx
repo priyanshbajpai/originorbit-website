@@ -25,16 +25,16 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
   };
   const closeReplay = () => { replay.current?.pause(); dialog.current?.close(); replay.current?.removeAttribute('src'); replay.current?.load(); replayTrigger.current?.focus(); };
   return <>
-    <section className={`hero-story final-film ${reduced ? 'is-reduced' : ''}`} id="top" ref={root} aria-label="OriginOrbit creative studio">
+    <section className={`hero-story final-film ${reduced ? 'is-reduced' : ''}`} id="top" ref={root} aria-label="Origin & Orbit creative studio">
       <div className={`hero-stage scene-${captionIndex} ${leadVisible ? '' : 'has-progress'}`}>
         <div className="hero-media">
-          <picture className="hero-poster"><source media="(max-width: 700px), (max-width: 1000px) and (orientation: portrait)" srcSet="/media/hero-v4/poster-mobile.webp" /><img src={POSTER} alt="A handmade clay astronaut with OriginOrbit logo eyes gathers clay on Mars" width="1920" height="1080" fetchPriority="high" /></picture>
+          <picture className="hero-poster"><source media="(max-width: 700px), (max-width: 1000px) and (orientation: portrait)" srcSet="/media/hero-v4/poster-mobile.webp" /><img src={POSTER} alt="A handmade clay astronaut with Origin & Orbit logo eyes gathers clay on Mars" width="1920" height="1080" fetchPriority="high" /></picture>
           {!reduced && <video ref={video} className="hero-film" muted playsInline preload="auto" disablePictureInPicture aria-hidden="true" />}
         </div>
         <div className="hero-shade" />
         <div className={`hero-lead ${leadVisible ? '' : 'is-hidden'}`} aria-hidden={!leadVisible} inert={!leadVisible}>
           <span className="eyebrow">ORIGIN &amp; ORBIT — AI-NATIVE CREATIVE STUDIO</span>
-          <h1>Ideas made<br />impossible to ignore</h1>
+          <h1>Ideas made<br />{' '}impossible to ignore</h1>
           <p>We make imagery, films, campaigns and interactive experiences—and build creative systems that help brands keep creating.</p>
           <div className="hero-actions"><a className="button button-orange" href="#services">Explore services <Arrow /></a><a className="hero-secondary" href="/start-a-project/">Start a project <Arrow /></a></div>
         </div>
@@ -50,11 +50,11 @@ export default function Hero({ reduced, mobile }: { reduced: boolean; mobile: bo
         {!reduced && <a className="skip-intro" href="#services">Skip intro <span aria-hidden="true">↓</span></a>}
       </div>
     </section>
-    <div className="film-note"><span>AN ORIGINAL ORIGINORBIT FILM</span><button ref={replayTrigger} type="button" onClick={openReplay}>Play the film <span aria-hidden="true">↗</span></button></div>
-    <dialog className="film-dialog" ref={dialog} aria-label="OriginOrbit astronaut film" onCancel={event => { event.preventDefault(); closeReplay(); }} onClick={event => { if (event.target === event.currentTarget) closeReplay(); }}>
+    <div className="film-note"><span>AN ORIGINAL ORIGIN &amp; ORBIT FILM</span><button ref={replayTrigger} type="button" onClick={openReplay}>Play the film <span aria-hidden="true">↗</span></button></div>
+    <dialog className="film-dialog" ref={dialog} aria-label="Origin & Orbit astronaut film" onCancel={event => { event.preventDefault(); closeReplay(); }} onClick={event => { if (event.target === event.currentTarget) closeReplay(); }}>
       <div className="dialog-top"><span>Every idea has an origin</span><button type="button" onClick={closeReplay}>Close ×</button></div>
       <video ref={replay} controls playsInline preload="none" aria-label="A clay astronaut gathers Mars clay, floats outside a closed space station and shapes a flower by hand" />
-      <p>An original studio experiment by OriginOrbit</p>
+      <p>An original studio experiment by Origin &amp; Orbit</p>
     </dialog>
   </>;
 }

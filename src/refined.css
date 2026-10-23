@@ -262,6 +262,6 @@ section,.service-panel{scroll-margin-top:0}
   .service-deck{overflow:hidden;isolation:isolate;margin:12px;contain:paint}
   .service-panel,.service-panel.is-active{inset:0;opacity:1;transition:none;will-change:transform;transform:translate3d(0,100%,0);contain:paint}
   .service-panel:first-child{transform:translate3d(0,0,0);visibility:visible}
-  .service-panel:nth-child(1){z-index:1}.service-panel:nth-child(2){z-index:2}.service-panel:nth-child(3){z-index:3}.service-panel:nth-child(4){z-index:4}
+  .service-panel{z-index:var(--panel-order)}
   .panel-art{filter:none}
 }
