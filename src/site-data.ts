@@ -1,6 +1,6 @@
 export const CONTACT_EMAIL = 'contact@originorbit.studio';
-export const PROJECT_FORM_URL = 'https://forms.gle/2AEPuZ9GTGucZqdc8';
-export const PROJECT_FORM_EMBED = 'https://docs.google.com/forms/d/e/1FAIpQLSd34SvK3Iuel89PtjCPXaPWFEy5wZg5jAw321R4wJkimVZJIQ/viewform?embedded=true';
+export const PROJECT_FORM_URL = 'https://tally.so/r/OQDNzM';
+export const PROJECT_FORM_EMBED = 'https://tally.so/embed/OQDNzM?transparentBackground=1&dynamicHeight=1';
 export const BOOKING_URL = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ204E6nelUbcxVY5LtaTYkGAaJwxGYyBYKeYv5wyHpWt64UJOQnqMGUf1fptEV5uOnT0stExPx3?gv=true';
 export const FILM_DESKTOP = '/media/hero-v4/desktop.mp4';
 export const FILM_MOBILE = '/media/hero-v4/mobile.mp4';
